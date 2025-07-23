@@ -26,20 +26,26 @@ export async function ejecutarAccionGSB(accion_gsb, arg = '{}', parseador = null
   }
 }
 
-
 export async function obtenerTrabajadores() {
-  const arg = JSON.stringify({
-    cdaplicacion: conexionBase.aplicacion
-  })
+  try {
+    const arg = JSON.stringify({
+      cdaplicacion: conexionBase.aplicacion
+    })
 
-  return await ejecutarAccionGSB('a_leer_trabajadores', arg, datos =>
-    datos.map(item => ({
-      codigo: item[0],
-      nombre: item[1]
-    }))
-  )
+    const response = await ejecutarAccionGSB('a_leer_trabajadores', arg)
+
+    if (response.resultado === 'ok') {
+      return response.datos.map(p => ({
+        codigo: p[0],
+        nombre: p[1]
+      }))
+    } else {
+      throw response.datos
+    }
+  } catch (err) {
+    throw `Error al obtener trabajadores: ${err}`
+  }
 }
-
 
 export async function obtenerProyectos() {
   try {
