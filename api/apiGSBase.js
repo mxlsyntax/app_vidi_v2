@@ -1,6 +1,6 @@
 import { conexionBase, urlGSBase } from './configConexion'
 import { useUserStore } from '@/stores/user'
-
+import { Num_aFecha, format_fecha_global } from '@/js/utilidades'
 export async function ejecutarAccionGSB(accion_gsb, arg = '{}', parseador = null) {
   const params = {
     ...conexionBase,
@@ -18,7 +18,6 @@ export async function ejecutarAccionGSB(accion_gsb, arg = '{}', parseador = null
 
     const text = await res.text()
     const data = JSON.parse(text)
-    console.log('Respuesta de GSB:', data)
     
     return data
   } catch (err) {
@@ -36,7 +35,7 @@ export async function obtenerTrabajadores() {
 
     if (response.resultado === 'ok') {
       return response.datos.map(p => ({
-        codigo: p[0],
+        cdtrabajador: p[0],
         nombre: p[1]
       }))
     } else {
@@ -86,8 +85,8 @@ export async function a_devolver_viajes_param({ cdtrabajador, fechaDesde, fechaH
       deno_proyecto: viaje[3],
       wp: viaje[4],
       motivo: viaje[5],
-      fecha_ini: viaje[6],
-      fecha_fin: viaje[7],
+      fecha_ini: Num_aFecha(viaje[6]),
+      fecha_fin: Num_aFecha(viaje[7]),
       total: viaje[8],
       codigos_trab: viaje[9],
       deno_trabajadores: viaje[10],

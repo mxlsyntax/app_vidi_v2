@@ -1,4 +1,4 @@
-//NG20240724 PASO DE FECHA STRING A FECHA NUM
+//NG20240724 PASO DE FECHA STRING A FECHA NUM con /
 export function Fecha_aNum(fecha) {
   var fecha_gsbase = 0;
   if (fecha != "") {
@@ -18,6 +18,13 @@ export function Fecha_aNum(fecha) {
     fecha_gsbase += dia;
   }
   return fecha_gsbase;
+}
+
+// PASO DE FECHA STRING A FECHA NUM con -
+export function Fecha_aNumGuion(fechaStr) {
+  const [a, m, d] = fechaStr.split('-').map(n => parseInt(n, 10))
+  const dias = d - 1 + (m - 1) * 31
+  return (a - 2000) * 372 + dias
 }
 
 //NG20240724 PASO DE FECHA GSBASE INT A STRING FECHA

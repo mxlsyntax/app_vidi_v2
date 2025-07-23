@@ -5,22 +5,19 @@
     <h1 class="text-xl font-bold mb-4">Listado de Viajes</h1>
 
     <div class="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-  <select v-model="filtroTrabajador" :disabled="!userStore.isAdmin" class="w-full border p-2 rounded">
-    <option
-      v-for="trabajador in todosLosTrabajadores"
-      :key="trabajador.cdtrabajador"
-      :value="trabajador.cdtrabajador"
-    >
-      {{ trabajador.nombre }} ({{ trabajador.cdtrabajador }})
-    </option>
-  </select>
+      <select v-model="filtros.cdtrabajador" :disabled="!userStore.isAdmin" class="w-full border p-2 rounded">
+        <option v-for="trabajador in todosLosTrabajadores" :key="trabajador.cdtrabajador"
+          :value="trabajador.cdtrabajador">
+          {{ trabajador.nombre }} - ({{ trabajador.cdtrabajador }})
+        </option>
+      </select>
       <div>
         <label class="block text-sm font-medium">Fecha desde</label>
-        <input v-model="filtroFechaDesde" class="w-full border p-2 rounded" type="date" />
+        <input v-model="filtros.fechaDesde" class="w-full border p-2 rounded" type="date" />
       </div>
       <div>
         <label class="block text-sm font-medium">Fecha hasta</label>
-        <input v-model="filtroFechaHasta" class="w-full border p-2 rounded" type="date" />
+        <input v-model="filtros.fechaHasta" class="w-full border p-2 rounded" type="date" />
       </div>
     </div>
 
@@ -28,7 +25,7 @@
       Buscar
     </button>
 
-<TablaViajes :viajes="viajes" @seleccionarViaje="verDetalleViaje" />
+    <TablaViajes :viajes="viajes" @seleccionarViaje="verDetalleViaje" />
   </div>
   <!-- Botón flotante -->
   <button @click="irANuevoViaje"
@@ -39,10 +36,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import TablaViajes from '@/components/TablaViajes.vue'
 import { a_devolver_viajes_param, obtenerTrabajadores } from '../../api/apiGSBase'
-import { Num_aFecha } from '@/js/utilidades'
+import { Num_aFecha, format_fecha_global, Fecha_aNumGuion } from '@/js/utilidades'
 import { useUserStore } from '@/stores/user'
 import Header from '@/components/Header.vue'
 import { useRouter } from 'vue-router'
@@ -51,19 +48,14 @@ import { useRouter } from 'vue-router'
 const viajes = ref([])
 const trabajadores = ref([])
 const router = useRouter()
-const filtroTrabajador = ref('')
-const filtroFechaDesde = ref('2025-07-01')
-const filtroFechaHasta = ref('2025-07-15')
 const userStore = useUserStore()
+const filtros = reactive({
+  cdtrabajador: '',
+  fechaDesde: '2025-07-01',
+  fechaHasta: '2025-07-31'
+})
 const esAdmin = ref(userStore.isAdmin)
 const todosLosTrabajadores = ref([])
-
-// Función auxiliar (formato fecha)
-function Fecha_aNum(fechaStr) {
-  const [a, m, d] = fechaStr.split('-').map(n => parseInt(n, 10))
-  const dias = d - 1 + (m - 1) * 31
-  return (a - 2000) * 372 + dias
-}
 
 function cerrarSesion() {
   user.logout()
@@ -81,10 +73,10 @@ function irANuevoViaje() {
 
 // Función para traer viajes desde la API
 async function buscarViajes() {
-  
-  const cdtrabajador = filtroTrabajador.value
-  const fechaDesde = Fecha_aNum(filtroFechaDesde.value)
-  const fechaHasta = Fecha_aNum(filtroFechaHasta.value)
+
+  const cdtrabajador = filtros.cdtrabajador || userStore.cdtrabajador
+  const fechaDesde = Fecha_aNumGuion(filtros.fechaDesde)
+  const fechaHasta = Fecha_aNumGuion(filtros.fechaHasta)
 
   try {
     const response = await a_devolver_viajes_param({ cdtrabajador, fechaDesde, fechaHasta })
@@ -101,8 +93,8 @@ async function buscarViajes() {
       deno_proy: item[3],
       wp: item[4],
       motivo: item[5],
-      fecha_ini: Num_aFecha(item[6]),
-      fecha_fin: Num_aFecha(item[7]),
+      fecha_ini: format_fecha_global(Num_aFecha(item[6])),
+      fecha_fin: format_fecha_global(Num_aFecha(item[7])),
       total: item[8],
       cdtb: item[9],
       deno_trab: item[10],
@@ -123,16 +115,16 @@ async function buscarViajes() {
 // Ejecutar al montar
 onMounted(async () => {
   try {
-  // Si es admin, permite gestionar trabajadores
+    // Si es admin, permite gestionar trabajadores
     try {
       todosLosTrabajadores.value = await obtenerTrabajadores()
     } catch (err) {
       alert('Error al cargar trabajadores: ' + err)
     }
-  
+
+    filtros.cdtrabajador = userStore.cdtrabajador || ''  // o .value si es ref, según cómo accedas
 
     // Establecer el trabajador logueado como filtro por defecto
-    filtroTrabajador.value = userStore.cdtrabajador
     await buscarViajes()
   } catch (err) {
     alert(err)

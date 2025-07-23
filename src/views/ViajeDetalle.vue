@@ -85,7 +85,6 @@ onMounted( () => {
     const encontrado = viajes.find(v => v.codigo === route.params.codigo)
     if (encontrado) {
       Object.assign(viaje, encontrado)
-      console.log('Viaje encontrado:', viaje)
       // 👇 Cargar dietas relacionadas
       const todasDietas = JSON.parse(localStorage.getItem('dietas') || '[]')
       dietasAsociadas.value = todasDietas.filter(d => d.cdviaje === viaje.codigo)

@@ -151,7 +151,6 @@ onMounted(async () => {
   if (esAdmin.value) {
     try {
       todosLosTrabajadores.value = await obtenerTrabajadores()
-      console.log('Trabajadores cargados:', todosLosTrabajadores.value)
     } catch (err) {
       alert('Error al cargar trabajadores: ' + err)
     }
