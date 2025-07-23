@@ -5,9 +5,13 @@
     <h1 class="text-xl font-bold mb-4">Listado de Viajes</h1>
 
     <div class="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-  <select class="border rounded p-2 w-full">
-    <option v-for="t in trabajadores" :key="t.cdtrabajador" :value="t.cdtrabajador">
-      {{ t.nombre }}
+  <select v-model="filtroTrabajador" :disabled="!userStore.isAdmin" class="w-full border p-2 rounded">
+    <option
+      v-for="trabajador in trabajadores"
+      :key="trabajador.cdtrabajador"
+      :value="trabajador.cdtrabajador"
+    >
+      {{ trabajador.nombre }} ({{ trabajador.cdtrabajador }})
     </option>
   </select>
       <div>
@@ -47,13 +51,10 @@ import { useRouter } from 'vue-router'
 const viajes = ref([])
 const trabajadores = ref([])
 const router = useRouter()
-const filtroTrabajador = ref('0020')
+const filtroTrabajador = ref('')
 const filtroFechaDesde = ref('2025-07-01')
 const filtroFechaHasta = ref('2025-07-15')
 const userStore = useUserStore()
-
-// Al iniciar, el trabajador seleccionado será el logueado
-const trabajadorSeleccionado = ref(userStore.cdtrabajador)
 
 // Función auxiliar (formato fecha)
 function Fecha_aNum(fechaStr) {
@@ -118,17 +119,21 @@ async function buscarViajes() {
 onMounted(async () => {
   try {
     const res = await obtenerTrabajadores()
+
     const trabajadoresRaw = res.datos
     trabajadores.value = trabajadoresRaw.map(t => ({
       cdtrabajador: t[0],
       nombre: t[1]
     }))
+
     // Establecer el trabajador logueado como filtro por defecto
-    filtroTrabajador.value = trabajadorSeleccionado.value
+    filtroTrabajador.value = userStore.cdtrabajador
+
     await buscarViajes()
   } catch (err) {
     alert(err)
   }
 })
+
 
 </script>
