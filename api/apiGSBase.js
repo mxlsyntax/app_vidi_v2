@@ -18,7 +18,7 @@ export async function ejecutarAccionGSB(accion_gsb, arg = '{}', parseador = null
 
     const text = await res.text()
     const data = JSON.parse(text)
-
+    console.log('Respuesta de GSB:', data)
     
     return data
   } catch (err) {
@@ -95,7 +95,7 @@ export async function a_devolver_viajes_param({ cdtrabajador, fechaDesde, fechaH
       origen: viaje[12],
       destino: viaje[13],
       observaciones: viaje[14]
-    }))
+    })),
   )
 }
 

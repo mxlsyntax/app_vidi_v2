@@ -110,7 +110,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { obtenerProyectos, obtenerTrabajadores } from '../../api/apiGSBase'
 import { useUserStore } from '@/stores/user'
 

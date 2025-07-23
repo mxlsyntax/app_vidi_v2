@@ -7,7 +7,7 @@
     <div class="mb-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
   <select v-model="filtroTrabajador" :disabled="!userStore.isAdmin" class="w-full border p-2 rounded">
     <option
-      v-for="trabajador in trabajadores"
+      v-for="trabajador in todosLosTrabajadores"
       :key="trabajador.cdtrabajador"
       :value="trabajador.cdtrabajador"
     >
@@ -55,6 +55,8 @@ const filtroTrabajador = ref('')
 const filtroFechaDesde = ref('2025-07-01')
 const filtroFechaHasta = ref('2025-07-15')
 const userStore = useUserStore()
+const esAdmin = ref(userStore.isAdmin)
+const todosLosTrabajadores = ref([])
 
 // Función auxiliar (formato fecha)
 function Fecha_aNum(fechaStr) {
@@ -79,15 +81,13 @@ function irANuevoViaje() {
 
 // Función para traer viajes desde la API
 async function buscarViajes() {
-
+  
   const cdtrabajador = filtroTrabajador.value
   const fechaDesde = Fecha_aNum(filtroFechaDesde.value)
   const fechaHasta = Fecha_aNum(filtroFechaHasta.value)
 
   try {
     const response = await a_devolver_viajes_param({ cdtrabajador, fechaDesde, fechaHasta })
-
-
     if (!response || !response.datos) {
       alert('No se encontraron datos')
       viajes.value = []
@@ -123,17 +123,16 @@ async function buscarViajes() {
 // Ejecutar al montar
 onMounted(async () => {
   try {
-    const res = await obtenerTrabajadores()
-
-    const trabajadoresRaw = res.datos
-    trabajadores.value = trabajadoresRaw.map(t => ({
-      cdtrabajador: t[0],
-      nombre: t[1]
-    }))
+  // Si es admin, permite gestionar trabajadores
+    try {
+      todosLosTrabajadores.value = await obtenerTrabajadores()
+    } catch (err) {
+      alert('Error al cargar trabajadores: ' + err)
+    }
+  
 
     // Establecer el trabajador logueado como filtro por defecto
     filtroTrabajador.value = userStore.cdtrabajador
-
     await buscarViajes()
   } catch (err) {
     alert(err)
