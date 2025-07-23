@@ -5,18 +5,19 @@
       <!-- Denominación del viaje -->
       <div>
         <label class="font-semibold">Nombre del viaje:</label>
-        <input v-model="viaje.deno_viaje" class="border p-2 w-full" />
+        <input v-model="viaje.denominacion" class="border p-2 w-full" />
       </div>
 
       <!-- Proyecto (desplegable) -->
       <div>
         <label class="font-semibold">Proyecto:</label>
-        <select v-model="viaje.cdProyecto" class="border p-2 w-full">
-          <option value="" disabled>Selecciona un proyecto</option>
-          <option v-for="proy in proyectos" :key="proy.id" :value="proy.id">
-            {{ proy.denominacion }}
-          </option>
-        </select>
+<select v-model="viaje.cdproy" class="border w-full p-2 rounded">
+  <option disabled value="">Selecciona un proyecto</option>
+  <option v-for="p in proyectos" :key="p.codigo" :value="p.codigo">
+    {{ p.nombre }}
+  </option>
+</select>
+
       </div>
 
       <!-- WP -->
@@ -95,47 +96,31 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { defineProps, defineEmits, ref, onMounted } from 'vue'
+import { obtenerProyectos } from '../../api/apiGSBase'
+
+const proyectos = ref([])
 
 const props = defineProps({
   viaje: Object,
-  proyectos: {
-    type: Array,
-    default: () => []
-  },
-  trabajadores: {
-    type: Array,
-    default: () => []
-  }
+  esNuevo: Boolean
 })
-
 
 const emit = defineEmits(['guardar'])
 
-const viajeBase = {
-  codigo: '',
-  deno_viaje: '',
-  cdProyecto: '',
-  wp: '',
-  motivo: '',
-  origen: '',
-  destino: '',
-  fecha_ini: '',
-  fecha_fin: '',
-  observaciones: '',
-  lineas_trab: []
-}
-
-const viaje = reactive({
-  ...viajeBase,
-  ...(props.viaje || {})
-})
-console.log('viaje', viaje)
-
 function guardar() {
-  emit('guardar', { ...viaje })
+  emit('guardar')
 }
+onMounted(async () => {
+  try {
+    proyectos.value = await obtenerProyectos()
+  } catch (err) {
+    alert(err)
+  }
+})
+
 </script>
+
 
 
 

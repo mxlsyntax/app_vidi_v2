@@ -28,7 +28,7 @@
       Buscar
     </button>
 
-    <TablaViajes :viajes="viajes" />
+<TablaViajes :viajes="viajes" @seleccionarViaje="verDetalleViaje" />
   </div>
   <!-- Botón flotante -->
   <button @click="irANuevoViaje"
@@ -67,6 +67,11 @@ function cerrarSesion() {
   user.logout()
   router.push('/')
 }
+
+function verDetalleViaje(codigo) {
+  router.push(`/viajes/${codigo}`)
+}
+
 
 function irANuevoViaje() {
   router.push('/viajes/nuevo')

@@ -25,8 +25,8 @@ const routes = [
   { path: '/main', component: MainPage, meta: { title: 'Página principal' } },
   { path: '/avisos', component: AvisosPage, meta: { title: 'Avisos' } },
   { path: '/viajes', component: ViajesPage, meta: { title: 'Viajes' }  },
-  { path: '/viaje/nuevo', component: ViajeDetalle, meta: { title: 'Nuevo Viaje' } },
-  { path: '/viaje/:id?', component: ViajeDetalle, meta: { title: 'Detalle del Viaje' } },
+  { path: '/viajes/nuevo', component: ViajeDetalle, meta: { title: 'Nuevo Viaje' } },
+  { path: '/viajes/:codigo', component: ViajeDetalle, meta: { title: 'Detalle del Viaje' } },
   { path: '/dietas', component: DietasPage, meta: { title: 'Dietas' } },
   { path: '/dietas/nueva', component: DietaDetalle, meta: { title: 'Nueva Dieta' } },
   { path: '/dietas/:cddieta', component: DietaDetalle, meta: { title: 'Detalle de la Dieta' } }

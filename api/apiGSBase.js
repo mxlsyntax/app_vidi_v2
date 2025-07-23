@@ -42,17 +42,27 @@ export async function obtenerTrabajadores() {
 
 
 export async function obtenerProyectos() {
-  const arg = JSON.stringify({
-    cdaplicacion: conexionBase.aplicacion
-  })
+  try {
+    const arg = JSON.stringify({
+      cdaplicacion: conexionBase.aplicacion
+    })
 
-  return await ejecutarAccionGSB('a_leer_proyectos', arg, datos =>
-    datos.map(item => ({
-      id: item[0],
-      denominacion: item[1]
-    }))
-  )
+    const response = await ejecutarAccionGSB('a_leer_proyectos', arg)
+
+    if (response.resultado === 'ok') {
+      return response.datos.map(p => ({
+        codigo: p[0],
+        nombre: p[1]
+      }))
+    } else {
+      throw response.datos
+    }
+  } catch (err) {
+    throw `Error al obtener proyectos: ${err}`
+  }
 }
+
+
 
 export async function a_devolver_viajes_param({ cdtrabajador, fechaDesde, fechaHasta }) {
   const arg = JSON.stringify({
